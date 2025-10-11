@@ -112,11 +112,3 @@ Remarque: le mode image est particulièrement utile pour un zoom fluide et préc
 
 - Le composant de visualisation natif de GraphStream présente des limites de zoom/pan dans certains environnements Swing. Le mode “Capturer en image” est proposé comme solution pour une exploration confortable du graphe.
 - La résolution des bindings JDT peut dépendre de la structure du projet et de la présence de toutes les dépendances sources sur le classpath si vous élargissez l’analyse.
-
-## Licence
-
-Projet à usage académique. Adapter la licence selon vos besoins institutionnels.
-
-## Contact
-
-Pour toute question ou suggestion, merci d’ouvrir une issue sur le dépôt GitHub du projet.
