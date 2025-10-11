@@ -12,14 +12,16 @@ import com.tp.visitors.*;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.dom.*;
 
+/**
+ * Classe utilitaire pour tester l'analyse de base de l'AST.
+ * Affiche les informations sur les classes, méthodes, variables et invocations.
+ */
 public class Parser {
 
-   // Folder you want to analyze (e.g. your project src)
-	public static final String projectSourcePath =
-	        "/Users/clstialdsn/eclipse-workspace/company-app/src/main/java";
+    public static final String projectSourcePath =
+            "/Users/clstialdsn/eclipse-workspace/company-app/src/main/java";
 
     public static void main(String[] args) throws IOException {
-        // list .java files
         List<File> javaFiles = listJavaFilesForFolder(new File(projectSourcePath));
 
         for (File f : javaFiles) {
@@ -37,7 +39,9 @@ public class Parser {
         }
     }
 
-    // Recursively collect .java files
+    /**
+     * Collecte récursivement tous les fichiers .java d'un dossier.
+     */
     public static List<File> listJavaFilesForFolder(final File folder) {
         List<File> javaFiles = new ArrayList<>();
         for (File fileEntry : folder.listFiles()) {
@@ -50,11 +54,17 @@ public class Parser {
         return javaFiles;
     }
 
-    // Create AST (Java 17)
+    /**
+     * Crée un AST (Abstract Syntax Tree) à partir du code source Java.
+     * Utilise Java 17 (JLS17) avec résolution des bindings pour permettre
+     * l'analyse des types et des références entre classes.
+     */
     private static CompilationUnit parse(char[] classSource) {
         ASTParser parser = ASTParser.newParser(AST.JLS17);
         parser.setKind(ASTParser.K_COMPILATION_UNIT);
         parser.setSource(classSource);
+        
+        // Crucial pour résoudre les types et construire un graphe d'appel précis
         parser.setResolveBindings(true);
 
         Map<String, String> options = JavaCore.getOptions();
@@ -64,7 +74,9 @@ public class Parser {
         return (CompilationUnit) parser.createAST(null);
     }
 
-    // Print info: classes
+    /**
+     * Affiche les classes et leur hiérarchie d'héritage.
+     */
     public static void printClasses(CompilationUnit cu) {
         TypeDeclarationVisitor visitor = new TypeDeclarationVisitor();
         cu.accept(visitor);
@@ -76,7 +88,6 @@ public class Parser {
         }
     }
 
-    // Print info: methods
     public static void printMethods(CompilationUnit cu) {
         MethodDeclarationVisitor visitor = new MethodDeclarationVisitor();
         cu.accept(visitor);
@@ -87,7 +98,6 @@ public class Parser {
         }
     }
 
-    // Print info: variables
     public static void printVariables(CompilationUnit cu) {
         MethodDeclarationVisitor methodVisitor = new MethodDeclarationVisitor();
         cu.accept(methodVisitor);
@@ -104,7 +114,9 @@ public class Parser {
         }
     }
 
-    // Print info: method invocations
+    /**
+     * Affiche les invocations de méthodes pour chaque méthode analysée.
+     */
     public static void printMethodInvocations(CompilationUnit cu) {
         MethodDeclarationVisitor methodVisitor = new MethodDeclarationVisitor();
         cu.accept(methodVisitor);

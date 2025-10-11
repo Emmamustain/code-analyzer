@@ -6,6 +6,10 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.VariableDeclarationFragment;
 
+/**
+ * Visiteur AST pour collecter les fragments de déclaration de variables.
+ * Utile pour analyser les variables locales dans les méthodes.
+ */
 public class VariableDeclarationFragmentVisitor extends ASTVisitor {
     private final List<VariableDeclarationFragment> variables = new ArrayList<>();
 

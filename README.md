@@ -1,117 +1,122 @@
-# Analyseur de Code Java Statique avec Visualisation de Graphe d'Appel
+# Analyseur Statique de Code Java avec Visualisation du Graphe d’Appel
 
-Ce projet, réalisé dans le cadre d'un projet universitaire, est un analyseur de code statique pour applications Java. Il parcourt le code source, calcule un ensemble complet de métrriques logicielles et génère un graphe d'appel interactif pour visualiser les relations entre les méthodes.
-
-L'application dispose d'une interface graphique construite avec Java Swing.
+Ce projet, réalisé dans un cadre universitaire, est un analyseur statique pour applications Java. Il parcourt le code source, calcule un ensemble de métriques logicielles et génère un graphe d’appel pour visualiser les relations entre méthodes. L’application propose une interface graphique réalisée avec Java Swing.
 
 ## Fonctionnalités
 
-### Métriques Statistiques
-L'application calcule et affiche 13 métriques précises sur le code analysé, notamment le nombre de classes, de méthodes, de packages, les moyennes, les top 10 %, etc.
+### Métriques
+- Calcul et affichage de 13 métriques (nombre de classes, de méthodes, de packages, lignes de code, moyennes, top 10 %, etc.).
+- Résultats disponibles dans l’onglet Statistiques et en sortie console si nécessaire.
 
-### Graphe d'Appel
-- Représentation textuelle des relations d'appel entre méthodes
-- Visualisation interactive dans une fenêtre dédiée
+### Graphe d’appel
+- Représentation textuelle des relations d’appel (onglet Graphe d’appel).
+- Visualisation interactive dans une fenêtre dédiée (GraphStream).
 
-### Fonctionnalités Avancées
-- Visualisation interactive: molette pour zoom/dézoom, glisser-déposer pour se déplacer
-- Coloration par package: chaque package possède une couleur unique
-- Légende dynamique: correspondance couleur/package
-- Labels simplifiés: format Classe.méthode pour une meilleure lisibilité
-- Style graphique soigné: nœuds et arêtes stylisés via le CSS de GraphStream
+### Améliorations de lisibilité et d’usage
+- Coloration par package avec légende associée.
+- Labels simplifiés au format Classe.méthode.
+- Styles soignés (nœuds, arêtes, arrière-plan du texte).
+- Bouton “Capturer en image” pour convertir le graphe en une image haute résolution, puis exploration fluide de l’image (zoom au curseur, déplacement par glisser). Cette approche contourne les limites de zoom/pan du composant natif GraphStream.
 
-## Stack Technique
+## Pile technique
 
-- Langage: Java 17
-- Build/gestion des dépendances: Maven
-- Parsing et analyse du code (AST): Eclipse JDT Core
-- Visualisation du graphe: GraphStream
-- Interface graphique: Java Swing
+- Langage : Java 17
+- Build et dépendances : Maven
+- Parsing/analyse (AST) : Eclipse JDT Core
+- Visualisation : GraphStream
+- Interface : Java Swing
 
-## Installation et Lancement
+## Installation et lancement
 
 ### Prérequis
-- Java Development Kit (JDK) 17 ou supérieur
-- Un IDE compatible Maven (IntelliJ IDEA, Eclipse, ou VS Code avec extensions Java/Maven)
-- Connexion Internet lors du premier import (pour télécharger les dépendances Maven)
+- JDK 17 ou supérieur
+- IDE compatible Maven (IntelliJ IDEA, Eclipse, VS Code avec extensions Java/Maven)
+- Connexion Internet au premier import pour la résolution des dépendances
 
-### 1. Récupérer le projet (archive .zip)
-- Décompressez l’archive du projet dans un dossier de votre choix.
+### Récupération du projet
+- Clone ou archive ZIP, puis extraction dans le dossier de votre choix.
 
-### 2. Importer le projet Maven dans l’IDE
-- Eclipse:
+### Import Maven dans l’IDE
+- Eclipse
   - File → Import…
-  - Maven → Existing Maven Projects → Next
-  - Root Directory → parcourir le dossier décompressé
-  - Vérifier que pom.xml est détecté → Finish
-- IntelliJ IDEA:
+  - Maven → Existing Maven Projects
+  - Sélectionner le dossier racine (contenant pom.xml) → Finish
+- IntelliJ IDEA
   - File → Open…
-  - Sélectionner le dossier racine qui contient pom.xml
-  - Ouvrir “as Project” et attendre la fin de l’indexation et du téléchargement des dépendances
-- VS Code:
+  - Ouvrir le dossier racine (pom.xml détecté) et attendre l’indexation
+- VS Code
   - File → Open Folder…
-  - Ouvrir le dossier racine (qui contient pom.xml)
-  - Accepter l’import Maven et attendre la résolution des dépendances
+  - Ouvrir le dossier racine, accepter l’import Maven
 
-Remarque: Maven gère automatiquement les bibliothèques nécessaires (Eclipse JDT, GraphStream, etc.).
+Maven télécharge automatiquement Eclipse JDT, GraphStream et les autres dépendances.
 
-### 3. Lancer l’application
-Deux options:
-
+### Lancer l’application
 - Depuis l’IDE (recommandé)
-  - Lancer la classe GUI: `com.tp.gui.AnalyzerGUI` (interface Swing)
-  - Optionnel: lancer la version console: `com.tp.Analyzer`
-
-- En ligne de commande (facultatif)
-  - Dans le dossier du projet (celui qui contient pom.xml):
+  - Lancer la classe GUI: com.tp.gui.AnalyzerGUI
+- En ligne de commande (optionnel)
+  - À la racine du projet (contenant pom.xml):
     ```bash
     mvn clean compile
     ```
-  - Le lancement de la GUI se fait de préférence depuis l’IDE.
+  - Le lancement de la GUI se fait plus simplement depuis l’IDE.
 
-## Manuel d’Utilisation
+## Manuel d’utilisation
 
-1. Lancement  
-   Au démarrage, la fenêtre “Code Analyzer” s’ouvre.
+1) Démarrage
+- La fenêtre “Analyseur de Code” s’ouvre avec trois boutons et deux onglets.
 
-2. Sélection d’un projet  
-   - Cliquer sur “Select Project”  
-   - Choisir le dossier du code source Java à analyser (ex: `src/main/java` d’un projet)  
-   - Valider: le chemin s’affiche dans l’onglet “Statistics”
+2) Sélection du projet
+- Cliquer sur “Sélectionner un projet”
+- Choisir le dossier du projet Java à analyser (le dossier racine du projet suffit)
+- Le chemin sélectionné s’affiche dans l’onglet Statistiques
 
-3. Analyse du code  
-   - Cliquer sur “Analyze”  
-   - L’application parcourt tous les fichiers `.java`  
-   - L’onglet “Statistics” affiche les 13 métriques calculées  
-   - L’onglet “Call Graph” affiche la représentation textuelle du graphe d’appel
+3) Analyse
+- Cliquer sur “Analyser”
+- Les fichiers .java sont parcourus, et les métriques sont affichées dans l’onglet Statistiques
+- L’onglet “Graphe d’appel (texte)” montre la structure d’appel sous forme lisible
 
-4. Visualisation du graphe d’appel  
-   - Cliquer sur “Visualize Call Graph”  
-   - Une fenêtre s’ouvre avec le graphe interactif  
-   - Interactions:
-     - Zoom/Dézoom: molette de la souris
-     - Déplacement: cliquer-glisser dans la zone du graphe  
-   - La légende à droite indique la couleur associée à chaque package
+4) Visualisation du graphe
+- Cliquer sur “Visualiser le graphe d’appel”
+- Une fenêtre affiche le graphe coloré par package, avec une légende à droite
+- Boutons disponibles:
+  - “Ajuster la vue”: recadre la caméra
+  - “Capturer en image”: convertit la vue en image haute résolution, puis ouvre un visualiseur d’image avec:
+    - Zoom/dézoom à la molette (centré sur le curseur)
+    - Déplacement par clic-glisser
+    - Indication du niveau de zoom
 
-## Fonctionnement Interne
+Remarque: le mode image est particulièrement utile pour un zoom fluide et précis sur de grands graphes.
 
-1. Découverte des fichiers  
-   Parcours récursif du dossier sélectionné pour collecter les fichiers `.java`.
+## Fonctionnement interne
 
-2. Parsing AST  
-   Chaque fichier est parsé avec Eclipse JDT pour produire un Abstract Syntax Tree (AST).  
-   La résolution des bindings (`setResolveBindings(true)`) est activée pour enrichir l’analyse sémantique.
+1) Découverte des sources
+- Parcours récursif du dossier sélectionné pour collecter les fichiers .java.
 
-3. Visiteurs spécialisés  
-   Parcours de l’AST pour collecter les déclarations de classes et de méthodes, les variables, et les invocations (y compris `super.method()`).
+2) Parsing AST (Eclipse JDT)
+- Création d’un AST par fichier.
+- Activation de la résolution des bindings (setResolveBindings(true)) pour obtenir des informations sémantiques fiables (noms qualifiés, types, méthodes).
 
-4. Agrégation des métriques  
-   La classe `ParserAnalyzer` agrège les données dans des modèles (`ClassMetrics`, `MethodMetrics`) et construit la structure du graphe d’appel: `Map<String, Set<String>>`.
+3) Visiteurs spécialisés
+- Collecte des déclarations (classes, méthodes), variables, et invocations (y compris super.method()).
 
-5. Visualisation  
-   - Représentation textuelle des appels dans l’onglet “Call Graph”  
-   - Visualisation GraphStream dans une fenêtre dédiée:
-     - Coloration par package
-     - Labels simplifiés Classe.méthode
-     - Légende dynamique
-     - Mise en page calculée une fois avant l’affichage
+4) Agrégation des métriques
+- La classe ParserAnalyzer agrège les données dans des modèles (ClassMetrics, MethodMetrics).
+- Construction du graphe d’appel: Map<String, Set<String>> (clé: méthode appelante, valeur: méthodes appelées).
+
+5) Visualisation
+- Représentation textuelle du graphe dans l’onglet dédié.
+- Visualisation graphique via GraphStream (couleurs par package, labels simplifiés, légende).
+- Option de capture en image pour un zoom/pan fluides via un visualiseur personnalisé (Java2D).
+
+## Limitations connues
+
+- Le composant de visualisation natif de GraphStream présente des limites de zoom/pan dans certains environnements Swing. Le mode “Capturer en image” est proposé comme solution pour une exploration confortable du graphe.
+- La résolution des bindings JDT peut dépendre de la structure du projet et de la présence de toutes les dépendances sources sur le classpath si vous élargissez l’analyse.
+
+## Licence
+
+Projet à usage académique. Adapter la licence selon vos besoins institutionnels.
+
+## Contact
+
+Pour toute question ou suggestion, merci d’ouvrir une issue sur le dépôt GitHub du projet.

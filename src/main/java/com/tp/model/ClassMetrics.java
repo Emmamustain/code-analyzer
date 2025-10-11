@@ -3,6 +3,10 @@ package com.tp.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Modèle de données pour stocker les métriques d'une classe.
+ * Contient le nom, le package, le nombre d'attributs et la liste des méthodes.
+ */
 public class ClassMetrics {
     private String packageName;
     private String name;
@@ -14,6 +18,10 @@ public class ClassMetrics {
         this.name = name;
     }
 
+    /**
+     * Retourne le nom qualifié complet de la classe (package.nom).
+     * Utile pour l'affichage et les comparaisons.
+     */
     public String getFullName() { return packageName + "." + name; }
     public String getName() { return name; }
     public String getPackageName() { return packageName; }

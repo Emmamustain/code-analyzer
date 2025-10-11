@@ -6,6 +6,10 @@ import java.util.List;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 
+/**
+ * Visiteur AST pour collecter toutes les déclarations de méthodes d'une classe.
+ * Utilisé pour calculer le nombre total de méthodes et leurs métriques (LOC, paramètres).
+ */
 public class MethodDeclarationVisitor extends ASTVisitor {
     private final List<MethodDeclaration> methods = new ArrayList<>();
 

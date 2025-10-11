@@ -7,6 +7,10 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.IVariableBinding;
 import org.eclipse.jdt.core.dom.SimpleName;
 
+/**
+ * Visiteur AST pour collecter les accès aux champs/variables.
+ * Utile pour analyser les dépendances entre attributs.
+ */
 public class FieldAccessVisitor extends ASTVisitor {
     private final List<SimpleName> fields = new ArrayList<>();
 
