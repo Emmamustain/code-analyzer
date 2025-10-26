@@ -23,6 +23,10 @@ import java.util.Set;
 public class AnalyzerGUI extends JFrame {
   private JTextArea statsArea;
   private JTextArea callGraphArea;
+  private CouplingGraphPanel couplingGraphPanel;
+  private CouplingTextPanel couplingTextPanel;
+  private ClusteringPanel clusteringPanel;
+  private SpoonClusteringPanel spoonClusteringPanel;
   private File selectedDir;
 
   public AnalyzerGUI() {
@@ -42,9 +46,19 @@ public class AnalyzerGUI extends JFrame {
     JScrollPane statsScroll = new JScrollPane(statsArea);
     JScrollPane callScroll = new JScrollPane(callGraphArea);
 
+    // Créer les panels de couplage
+    couplingGraphPanel = new CouplingGraphPanel();
+    couplingTextPanel = new CouplingTextPanel();
+    clusteringPanel = new ClusteringPanel();
+    spoonClusteringPanel = new SpoonClusteringPanel();
+    
     JTabbedPane tabs = new JTabbedPane();
     tabs.addTab("Statistiques", statsScroll);
-    tabs.addTab("Graphe d’appel (texte)", callScroll);
+    tabs.addTab("Graphe d'appel (texte)", callScroll);
+    tabs.addTab("Graphe de Couplage", couplingGraphPanel);
+    tabs.addTab("Résumé Couplage", couplingTextPanel);
+    tabs.addTab("Clustering Hiérarchique", clusteringPanel);
+    tabs.addTab("Clustering Spoon", spoonClusteringPanel);
 
     JPanel topPanel = new JPanel();
     topPanel.add(selectBtn);
@@ -101,6 +115,12 @@ public class AnalyzerGUI extends JFrame {
 
       statsArea.setText(stats);
       callGraphArea.setText(graph);
+      
+      // Configurer les panels de couplage
+      couplingGraphPanel.setAnalyzer(pa);
+      couplingTextPanel.setAnalyzer(pa);
+      clusteringPanel.performClustering(pa);
+      spoonClusteringPanel.performClustering(pa);
 
     } catch (Exception ex) {
       ex.printStackTrace();
@@ -222,7 +242,7 @@ public class AnalyzerGUI extends JFrame {
     centerContainer.add(viewPanel, BorderLayout.CENTER);
 
     JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-    controlPanel.add(new JLabel("📊 Méthodes système filtrées pour plus de clarté"));
+    controlPanel.add(new JLabel("Méthodes système filtrées pour plus de clarté"));
 
     JButton fitBtn = new JButton("Ajuster la vue");
     fitBtn.addActionListener(ev -> fitView(viewer));

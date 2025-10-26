@@ -44,6 +44,12 @@
     <artifactId>gs-algo</artifactId>
     <version>2.0</version>
 </dependency>
+    <!-- Spoon for Java program analysis -->
+    <dependency>
+        <groupId>fr.inria.gforge.spoon</groupId>
+        <artifactId>spoon-core</artifactId>
+        <version>10.4.1</version>
+    </dependency>
 </dependencies>
 <build>
   <plugins>

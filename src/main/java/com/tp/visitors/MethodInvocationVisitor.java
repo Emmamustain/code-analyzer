@@ -18,11 +18,11 @@ public class MethodInvocationVisitor extends ASTVisitor {
     /**
      * Collecte les invocations de méthodes normales (ex: obj.method()).
      */
-    @Override
-    public boolean visit(MethodInvocation node) {
-        methods.add(node);
-        return super.visit(node);
-    }
+  @Override
+  public boolean visit(MethodInvocation node) {
+    methods.add(node);
+    return super.visit(node);
+  }
 
     /**
      * Collecte les invocations de méthodes de la super-classe (ex: super.method()).

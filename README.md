@@ -1,114 +1,181 @@
-# Analyseur Statique de Code Java avec Visualisation du Graphe d’Appel
+# Analyseur Statique de Code Java avec Couplage et Clustering Hiérarchique
 
-Ce projet, réalisé dans un cadre universitaire, est un analyseur statique pour applications Java. Il parcourt le code source, calcule un ensemble de métriques logicielles et génère un graphe d’appel pour visualiser les relations entre méthodes. L’application propose une interface graphique réalisée avec Java Swing.
+Ce projet est un analyseur statique complet pour applications Java qui calcule des métriques de couplage entre classes et implémente un algorithme de clustering hiérarchique pour identifier des modules cohésifs. L'application propose une interface graphique moderne réalisée avec Java Swing.
 
 ## Fonctionnalités
 
-### Métriques
-- Calcul et affichage de 13 métriques (nombre de classes, de méthodes, de packages, lignes de code, moyennes, top 10 %, etc.).
-- Résultats disponibles dans l’onglet Statistiques et en sortie console si nécessaire.
+### Métriques de base
 
-### Graphe d’appel
-- Représentation textuelle des relations d’appel (onglet Graphe d’appel).
-- Visualisation interactive dans une fenêtre dédiée (GraphStream).
+- Calcul et affichage de métriques logicielles (nombre de classes, méthodes, packages, lignes de code, moyennes, etc.)
+- Résultats disponibles dans l'onglet Statistiques
 
-### Améliorations de lisibilité et d’usage
-- Coloration par package avec légende associée.
-- Labels simplifiés au format Classe.méthode.
-- Styles soignés (nœuds, arêtes, arrière-plan du texte).
-- Bouton “Capturer en image” pour convertir le graphe en une image haute résolution, puis exploration fluide de l’image (zoom au curseur, déplacement par glisser). Cette approche contourne les limites de zoom/pan du composant natif GraphStream.
+### Analyse de couplage
+
+- **Calcul du couplage inter-classes** : Métrique normalisée basée sur les appels de méthodes entre classes
+- **Détection automatique des packages** : Support universel pour tous types de structures de packages
+- **Résolution avancée des types** : Gestion des appels sur paramètres et variables locales
+- **Filtrage intelligent** : Exclusion des méthodes de collections et des appels intra-classe
+
+### Visualisation du couplage
+
+- **Graphe de couplage interactif** : Visualisation avec GraphStream, coloration par package
+- **Résumé textuel** : Affichage détaillé des métriques de couplage
+- **Comparaison JDT vs Spoon** : Analyse comparative des deux approches de parsing
+
+### Clustering hiérarchique
+
+- **Algorithme agglomératif** : Clustering bottom-up avec linkage moyen
+- **Identification de modules** : Découpage du dendrogramme selon les contraintes CP et M/2
+- **Deux implémentations** : Version JDT et version Spoon pour comparaison
+- **Export CSV** : Génération de rapports détaillés des modules identifiés
+
+### Interface utilisateur
+
+- **Onglets spécialisés** : Graphe de couplage, Résumé couplage, Clustering hiérarchique, Clustering Spoon
+- **Contrôles interactifs** : Sliders pour seuils, boutons d'export, paramètres configurables
+- **Visualisation d'image** : Capture haute résolution avec zoom et navigation fluides
 
 ## Pile technique
 
-- Langage : Java 17
-- Build et dépendances : Maven
-- Parsing/analyse (AST) : Eclipse JDT Core
-- Visualisation : GraphStream
-- Interface : Java Swing
+- **Langage** : Java 17
+- **Build** : Maven
+- **Parsing AST** : Eclipse JDT Core
+- **Analyse Spoon** : Spoon Core 10.4.1
+- **Visualisation** : GraphStream
+- **Interface** : Java Swing
 
 ## Installation et lancement
 
 ### Prérequis
+
 - JDK 17 ou supérieur
-- IDE compatible Maven (IntelliJ IDEA, Eclipse, VS Code avec extensions Java/Maven)
-- Connexion Internet au premier import pour la résolution des dépendances
+- IDE compatible Maven (IntelliJ IDEA, Eclipse, VS Code)
+- Connexion Internet pour le téléchargement des dépendances
 
-### Récupération du projet
-- Clone ou archive ZIP, puis extraction dans le dossier de votre choix.
+### Installation
 
-### Import Maven dans l’IDE
-- Eclipse
-  - File → Import…
-  - Maven → Existing Maven Projects
-  - Sélectionner le dossier racine (contenant pom.xml) → Finish
-- IntelliJ IDEA
-  - File → Open…
-  - Ouvrir le dossier racine (pom.xml détecté) et attendre l’indexation
-- VS Code
-  - File → Open Folder…
-  - Ouvrir le dossier racine, accepter l’import Maven
+1. Cloner ou télécharger le projet
+2. Importer dans votre IDE :
+   - **Eclipse** : File → Import → Maven → Existing Maven Projects
+   - **IntelliJ** : File → Open → Sélectionner le dossier racine
+   - **VS Code** : File → Open Folder → Accepter l'import Maven
 
-Maven télécharge automatiquement Eclipse JDT, GraphStream et les autres dépendances.
+### Lancement
 
-### Lancer l’application
-- Depuis l’IDE (recommandé)
-  - Lancer la classe GUI: com.tp.gui.AnalyzerGUI
-- En ligne de commande (optionnel)
-  - À la racine du projet (contenant pom.xml):
-    ```bash
-    mvn clean compile
-    ```
-  - Le lancement de la GUI se fait plus simplement depuis l’IDE.
+```bash
+mvn exec:java -Dexec.mainClass="com.tp.gui.AnalyzerGUI"
+```
 
-## Manuel d’utilisation
+Ou depuis l'IDE : exécuter la classe `com.tp.gui.AnalyzerGUI`
 
-1) Démarrage
-- La fenêtre “Analyseur de Code” s’ouvre avec trois boutons et deux onglets.
+## Manuel d'utilisation
 
-2) Sélection du projet
-- Cliquer sur “Sélectionner un projet”
-- Choisir le dossier du projet Java à analyser (le dossier racine du projet suffit)
-- Le chemin sélectionné s’affiche dans l’onglet Statistiques
+### 1. Sélection du projet
 
-3) Analyse
-- Cliquer sur “Analyser”
-- Les fichiers .java sont parcourus, et les métriques sont affichées dans l’onglet Statistiques
-- L’onglet “Graphe d’appel (texte)” montre la structure d’appel sous forme lisible
+- Cliquer sur "Sélectionner un projet"
+- Choisir le dossier racine du projet Java à analyser
+- Le chemin s'affiche dans l'onglet Statistiques
 
-4) Visualisation du graphe
-- Cliquer sur “Visualiser le graphe d’appel”
-- Une fenêtre affiche le graphe coloré par package, avec une légende à droite
-- Boutons disponibles:
-  - “Ajuster la vue”: recadre la caméra
-  - “Capturer en image”: convertit la vue en image haute résolution, puis ouvre un visualiseur d’image avec:
-    - Zoom/dézoom à la molette (centré sur le curseur)
-    - Déplacement par clic-glisser
-    - Indication du niveau de zoom
+### 2. Analyse des métriques
 
-Remarque: le mode image est particulièrement utile pour un zoom fluide et précis sur de grands graphes.
+- Cliquer sur "Analyser"
+- Consulter les métriques dans l'onglet Statistiques
 
-## Fonctionnement interne
+### 3. Analyse du couplage
 
-1) Découverte des sources
-- Parcours récursif du dossier sélectionné pour collecter les fichiers .java.
+- **Onglet "Graphe de Couplage"** :
+  - Choisir entre analyseur JDT ou Spoon
+  - Ajuster les seuils avec les sliders
+  - Visualiser le graphe interactif
+- **Onglet "Résumé Couplage"** :
+  - Consulter les métriques détaillées
+  - Comparer les résultats JDT vs Spoon
 
-2) Parsing AST (Eclipse JDT)
-- Création d’un AST par fichier.
-- Activation de la résolution des bindings (setResolveBindings(true)) pour obtenir des informations sémantiques fiables (noms qualifiés, types, méthodes).
+### 4. Clustering hiérarchique
 
-3) Visiteurs spécialisés
-- Collecte des déclarations (classes, méthodes), variables, et invocations (y compris super.method()).
+- **Onglet "Clustering Hiérarchique"** :
+  - Configurer le seuil de couplage minimum (CP)
+  - Cliquer sur "Analyser le Clustering"
+  - Consulter les modules identifiés
+  - Exporter en CSV si nécessaire
+- **Onglet "Clustering Spoon"** :
+  - Même processus avec l'analyseur Spoon
+  - Comparaison des résultats
 
-4) Agrégation des métriques
-- La classe ParserAnalyzer agrège les données dans des modèles (ClassMetrics, MethodMetrics).
-- Construction du graphe d’appel: Map<String, Set<String>> (clé: méthode appelante, valeur: méthodes appelées).
+## Architecture technique
 
-5) Visualisation
-- Représentation textuelle du graphe dans l’onglet dédié.
-- Visualisation graphique via GraphStream (couleurs par package, labels simplifiés, légende).
-- Option de capture en image pour un zoom/pan fluides via un visualiseur personnalisé (Java2D).
+### Parsing et analyse
 
-## Limitations connues
+- **Eclipse JDT** : Parsing AST avec résolution des bindings
+- **Visiteurs spécialisés** : Collecte des déclarations, invocations et types
+- **Post-traitement** : Résolution des appels sur variables locales et paramètres
 
-- Le composant de visualisation natif de GraphStream présente des limites de zoom/pan dans certains environnements Swing. Le mode “Capturer en image” est proposé comme solution pour une exploration confortable du graphe.
-- La résolution des bindings JDT peut dépendre de la structure du projet et de la présence de toutes les dépendances sources sur le classpath si vous élargissez l’analyse.
+### Calcul du couplage
+
+- **Matrice de couplage** : Comptage des appels inter-classes uniques
+- **Normalisation** : Poids de couplage basés sur le nombre total d'arêtes
+- **Filtrage** : Exclusion des méthodes de collections et appels intra-classe
+
+### Clustering hiérarchique
+
+- **Algorithme agglomératif** : Fusion itérative des clusters les plus couplés
+- **Linkage moyen** : Calcul de distance entre clusters
+- **Découpage top-down** : Identification des modules selon les contraintes
+
+### Services Spoon
+
+- **Modèle Spoon** : Analyse alternative avec résolution de types avancée
+- **Comparaison** : Évaluation des différences entre JDT et Spoon
+- **Validation** : Vérification de la cohérence des résultats
+
+## Contraintes et limitations
+
+### Contraintes du clustering
+
+- **M/2 modules maximum** : M = nombre total de classes
+- **Seuil CP** : Couplage minimum requis par module
+- **Branches du dendrogramme** : Chaque module correspond à une branche unique
+
+### Limitations techniques
+
+- Résolution des bindings JDT dépendante de la structure du projet
+- Performance dégradée sur très gros projets (>1000 classes)
+- Visualisation GraphStream limitée sur certains environnements
+
+## Structure du projet
+
+```
+src/main/java/com/tp/
+├── analysis/           # Services d'analyse et clustering
+├── gui/               # Interface utilisateur
+├── model/             # Modèles de données
+├── spoon/             # Services Spoon
+├── visitors/          # Visiteurs AST
+├── Analyzer.java      # Point d'entrée principal
+└── ParserAnalyzer.java # Analyseur principal
+```
+
+## Exemples d'utilisation
+
+### Analyse d'un projet simple
+
+1. Sélectionner un projet Java
+2. Analyser les métriques de base
+3. Examiner le couplage entre classes
+4. Identifier les modules cohésifs avec le clustering
+
+### Comparaison JDT vs Spoon
+
+1. Analyser le même projet avec les deux approches
+2. Comparer les résultats dans l'onglet "Résumé Couplage"
+3. Évaluer les différences de résolution des types
+
+### Export et reporting
+
+1. Générer les rapports de clustering
+2. Exporter les modules en CSV
+3. Utiliser les données pour l'analyse d'architecture
+
+## Contribution
+
+Ce projet a été développé dans un cadre académique pour l'analyse statique de code Java et l'identification de modules cohésifs par clustering hiérarchique.
