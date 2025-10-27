@@ -155,7 +155,7 @@ public class ClusteringPanel extends JPanel {
         
         // Informations générales
         report.append("INFORMATIONS GÉNÉRALES:\n");
-        report.append("- Nombre total de classes: ").append(currentResult.getCouplingMatrix().size()).append("\n");
+        report.append("- Nombre total de classes: ").append(currentResult.getDendrogram().getClassCount()).append("\n");
         report.append("- Nombre de modules identifiés: ").append(currentResult.getModules().size()).append("\n");
         report.append("- Couplage minimum utilisé: ").append(minCouplingField.getText()).append("\n\n");
         

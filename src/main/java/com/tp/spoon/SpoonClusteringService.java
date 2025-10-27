@@ -29,6 +29,9 @@ public class SpoonClusteringService {
         
         System.out.println("=== DÉBUT PROCESSUS DE CLUSTERING SPOON ===");
         
+        // Calculer le couplage avec Spoon
+        couplingService.calculateCouplingMatrix();
+        
         // Obtenir les données de couplage
         Map<String, Map<String, Integer>> couplingMatrix = couplingService.getCouplingMatrix();
         Map<String, Map<String, Double>> couplingWeights = couplingService.getCouplingWeights();

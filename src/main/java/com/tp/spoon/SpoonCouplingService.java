@@ -6,105 +6,219 @@ import spoon.reflect.CtModel;
 import spoon.reflect.declaration.*;
 import spoon.reflect.code.*;
 import spoon.reflect.reference.*;
+import spoon.reflect.visitor.CtScanner;
 import java.util.*;
 
 /**
  * Service de calcul de couplage utilisant Spoon.
- * Utilise le ParserAnalyzer JDT pour obtenir le graphe d'appel,
- * puis applique les calculs de couplage avec Spoon.
+ * Génère son propre graphe d'appel avec Spoon et calcule le couplage indépendamment de JDT.
  */
 public class SpoonCouplingService {
     
-    private final ParserAnalyzer jdtAnalyzer;
+    private final String projectSourcePath;
+    private CtModel spoonModel;
+    private Map<String, Set<String>> spoonCallGraph;
     private Map<String, Map<String, Integer>> couplingMatrix;
     private Map<String, Map<String, Double>> couplingWeights;
     private int totalCalls;
     
     public SpoonCouplingService(ParserAnalyzer jdtAnalyzer) {
-        this.jdtAnalyzer = jdtAnalyzer;
+        this.projectSourcePath = jdtAnalyzer.getSourcePath();
     }
     
     /**
      * Calcule la matrice de couplage en utilisant Spoon.
      */
-    public void calculateCoupling() {
-        // Utiliser le graphe d'appel de JDT
-        Map<String, Set<String>> callGraph = jdtAnalyzer.getCallGraph();
+    public void calculateCouplingMatrix() {
+        System.out.println("=== CALCUL DU COUPLAGE SPOON ===");
         
-        // Calculer la matrice de couplage inter-classes
-        this.couplingMatrix = countInterClassCalls(callGraph);
+        // Étape 1: Construire le modèle Spoon
+        buildSpoonModel();
+        
+        // Étape 2: Générer le graphe d'appel avec Spoon
+        generateSpoonCallGraph();
+        
+        // Étape 3: Calculer la matrice de couplage
+        calculateCouplingMatrixFromCallGraph();
+        
+        System.out.println("Couplage Spoon calculé: " + totalCalls + " appels inter-classes");
+    }
+    
+    /**
+     * Construit le modèle Spoon à partir du code source.
+     */
+    private void buildSpoonModel() {
+        try {
+            Launcher launcher = new Launcher();
+            launcher.addInputResource(projectSourcePath);
+            launcher.getEnvironment().setComplianceLevel(17);
+            launcher.getEnvironment().setNoClasspath(false);
+            launcher.buildModel();
+            
+            this.spoonModel = launcher.getModel();
+            System.out.println("Modèle Spoon construit avec " + spoonModel.getAllTypes().size() + " types");
+            
+        } catch (Exception e) {
+            System.err.println("Erreur lors de la construction du modèle Spoon: " + e.getMessage());
+            throw new RuntimeException("Impossible de construire le modèle Spoon", e);
+        }
+    }
+    
+    /**
+     * Génère le graphe d'appel en utilisant Spoon.
+     */
+    private void generateSpoonCallGraph() {
+        this.spoonCallGraph = new HashMap<>();
+        
+        // Parcourir tous les types dans le modèle Spoon
+        for (CtType<?> type : spoonModel.getAllTypes()) {
+            if (type instanceof CtClass) {
+                CtClass<?> ctClass = (CtClass<?>) type;
+                String className = type.getQualifiedName();
+                
+                // Filtrer les classes système dès le début
+                if (isSystemClass(className)) {
+                    continue;
+                }
+                
+                // Parcourir toutes les méthodes de la classe
+                for (CtMethod<?> method : ctClass.getMethods()) {
+                    String methodSignature = className + "." + method.getSimpleName();
+                    Set<String> calledMethods = new HashSet<>();
+                    
+                    // Parcourir le corps de la méthode pour trouver les appels
+                    collectMethodCalls(method, calledMethods);
+                    
+                    // Ajouter la méthode même si elle n'a pas d'appels
+                    spoonCallGraph.put(methodSignature, calledMethods);
+                }
+            }
+        }
+        
+        System.out.println("Graphe d'appel Spoon généré avec " + spoonCallGraph.size() + " méthodes");
+    }
+    
+    /**
+     * Collecte les appels de méthodes dans le corps d'une méthode.
+     */
+    private void collectMethodCalls(CtMethod<?> method, Set<String> calledMethods) {
+        if (method.getBody() == null) return;
+        
+        // Utiliser un scanner Spoon pour collecter tous les appels de méthodes
+        method.getBody().accept(new CtScanner() {
+            @Override
+            public <T> void visitCtInvocation(spoon.reflect.code.CtInvocation<T> invocation) {
+                CtExecutableReference<?> executable = invocation.getExecutable();
+                if (executable != null) {
+                    String methodSignature = buildMethodSignature(invocation, executable);
+                    if (methodSignature != null) {
+                        calledMethods.add(methodSignature);
+                    }
+                }
+                super.visitCtInvocation(invocation);
+            }
+        });
+    }
+    
+    /**
+     * Construit la signature complète d'une méthode appelée.
+     */
+    private String buildMethodSignature(CtInvocation<?> invocation, CtExecutableReference<?> executable) {
+        try {
+            // Obtenir le type déclarant de la méthode
+            CtTypeReference<?> declaringType = executable.getDeclaringType();
+            if (declaringType != null) {
+                String className = declaringType.getQualifiedName();
+                
+                // Filtrer les classes système
+                if (isSystemClass(className)) {
+                    return null;
+                }
+                
+                String methodName = executable.getSimpleName();
+                return className + "." + methodName;
+            }
+        } catch (Exception e) {
+            // En cas d'erreur, essayer de construire la signature à partir de l'expression
+            CtExpression<?> target = invocation.getTarget();
+            if (target != null) {
+                String targetType = getExpressionType(target);
+                if (targetType != null && !isSystemClass(targetType)) {
+                    return targetType + "." + executable.getSimpleName();
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Détermine le type d'une expression.
+     */
+    private String getExpressionType(CtExpression<?> expression) {
+        if (expression instanceof CtFieldAccess) {
+            CtFieldAccess<?> fieldAccess = (CtFieldAccess<?>) expression;
+            CtTypeReference<?> type = fieldAccess.getVariable().getType();
+            return type != null ? type.getQualifiedName() : null;
+        }
+        
+        if (expression instanceof CtVariableAccess) {
+            CtVariableAccess<?> varAccess = (CtVariableAccess<?>) expression;
+            CtTypeReference<?> type = varAccess.getVariable().getType();
+            return type != null ? type.getQualifiedName() : null;
+        }
+        
+        if (expression instanceof CtThisAccess) {
+            CtThisAccess<?> thisAccess = (CtThisAccess<?>) expression;
+            CtTypeReference<?> type = thisAccess.getType();
+            return type != null ? type.getQualifiedName() : null;
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Calcule la matrice de couplage à partir du graphe d'appel Spoon.
+     */
+    private void calculateCouplingMatrixFromCallGraph() {
+        Map<String, Map<String, Integer>> matrix = new HashMap<>();
+        Set<String> uniqueCalls = new HashSet<>();
+        
+        for (String caller : spoonCallGraph.keySet()) {
+            String callerClass = extractClassName(caller);
+            if (callerClass == null || isSystemClass(callerClass)) continue;
+            
+            for (String callee : spoonCallGraph.get(caller)) {
+                String calleeClass = extractClassName(callee);
+                if (calleeClass == null || callerClass.equals(calleeClass) || isSystemClass(calleeClass)) continue;
+                
+                // Créer une clé unique pour éviter les doublons
+                String uniqueCall = callerClass + " -> " + calleeClass + " -> " + extractMethodName(callee);
+                
+                if (uniqueCalls.add(uniqueCall)) {
+                    matrix.computeIfAbsent(callerClass, k -> new HashMap<>())
+                          .merge(calleeClass, 1, Integer::sum);
+                }
+            }
+        }
+        
+        this.couplingMatrix = matrix;
         this.totalCalls = totalInterClassEdges(couplingMatrix);
         this.couplingWeights = normalizeToCouplingWeights(couplingMatrix, totalCalls);
     }
     
     /**
-     * Compte les appels inter-classes en utilisant Spoon pour la résolution des types.
+     * Vérifie si une classe est une classe système (JDK).
      */
-    private Map<String, Map<String, Integer>> countInterClassCalls(Map<String, Set<String>> callGraph) {
-        Map<String, Map<String, Integer>> matrix = new HashMap<>();
-        Set<String> uniqueCalls = new HashSet<>();
+    private boolean isSystemClass(String className) {
+        if (className == null) return false;
         
-        for (String caller : callGraph.keySet()) {
-            String callerClass = extractClassName(caller);
-            if (callerClass == null) continue;
-            
-            for (String callee : callGraph.get(caller)) {
-                String calleeClass = extractClassName(callee);
-                if (calleeClass == null || callerClass.equals(calleeClass)) continue;
-                
-                // Utiliser Spoon pour résoudre le type exact
-                String resolvedCalleeClass = resolveClassWithSpoon(callee);
-                if (resolvedCalleeClass != null && !callerClass.equals(resolvedCalleeClass)) {
-                    String uniqueCall = callerClass + " -> " + resolvedCalleeClass + " -> " + extractMethodName(callee);
-                    
-                    if (uniqueCalls.add(uniqueCall)) {
-                        matrix.computeIfAbsent(callerClass, k -> new HashMap<>())
-                              .merge(resolvedCalleeClass, 1, Integer::sum);
-                    }
-                }
-            }
-        }
-        
-        return matrix;
-    }
-    
-    /**
-     * Utilise Spoon pour résoudre le type exact d'une méthode.
-     */
-    private String resolveClassWithSpoon(String methodSignature) {
-        try {
-            // Créer un launcher Spoon pour analyser le projet
-            Launcher launcher = new Launcher();
-            launcher.addInputResource(jdtAnalyzer.getSourcePath());
-            launcher.getEnvironment().setComplianceLevel(17);
-            launcher.getEnvironment().setNoClasspath(false);
-            launcher.buildModel();
-            
-            CtModel model = launcher.getModel();
-            
-            // Chercher la méthode dans le modèle Spoon
-            String methodName = extractMethodName(methodSignature);
-            String className = extractClassName(methodSignature);
-            
-            if (className != null) {
-                // Utiliser l'API Spoon pour obtenir le type
-                for (CtType<?> type : model.getAllTypes()) {
-                    if (type.getQualifiedName().equals(className)) {
-                        for (CtMethod<?> method : type.getMethods()) {
-                            if (method.getSimpleName().equals(methodName)) {
-                                return type.getQualifiedName();
-                            }
-                        }
-                    }
-                }
-            }
-            
-        } catch (Exception e) {
-            // En cas d'erreur, retourner la classe extraite du nom
-            return extractClassName(methodSignature);
-        }
-        
-        return extractClassName(methodSignature);
+        // Classes système communes
+        return className.startsWith("java.") ||
+               className.startsWith("javax.") ||
+               className.startsWith("sun.") ||
+               className.startsWith("com.sun.") ||
+               className.startsWith("jdk.");
     }
     
     /**

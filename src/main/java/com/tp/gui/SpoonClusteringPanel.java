@@ -90,7 +90,7 @@ public class SpoonClusteringPanel extends JPanel {
             
             // Créer le service de couplage Spoon
             SpoonCouplingService couplingService = new SpoonCouplingService(analyzer);
-            couplingService.calculateCoupling();
+            couplingService.calculateCouplingMatrix();
             
             // Créer le service de clustering Spoon
             clusteringService = new SpoonClusteringService(couplingService);

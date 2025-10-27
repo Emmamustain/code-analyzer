@@ -71,6 +71,17 @@ public class ClusteringService {
             return "Aucun clustering effectué. Exécutez d'abord performCompleteClustering().";
         }
         
+        return generateTextReport(dendrogram, modules);
+    }
+    
+    /**
+     * Génère un rapport textuel du clustering avec des données spécifiques.
+     */
+    public String generateTextReport(DendrogramNode dendrogram, List<ModuleIdentifier.Module> modules) {
+        if (dendrogram == null || modules == null) {
+            return "Aucun clustering effectué. Exécutez d'abord performCompleteClustering().";
+        }
+        
         StringBuilder report = new StringBuilder();
         report.append("=== RAPPORT DE CLUSTERING HIÉRARCHIQUE ===\n\n");
         

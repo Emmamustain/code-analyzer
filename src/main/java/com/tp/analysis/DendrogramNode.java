@@ -91,10 +91,32 @@ public class DendrogramNode {
     }
     
     /**
-     * Retourne le nombre de classes dans ce nœud.
+     * Retourne le nombre de classes dans ce nœud (compte toutes les classes feuilles uniquement).
      */
     public int getClassCount() {
-        return classes.size();
+        if (isLeaf()) {
+            return 1;
+        }
+        
+        Set<String> allClasses = new HashSet<>();
+        collectLeaves(this, allClasses);
+        return allClasses.size();
+    }
+    
+    /**
+     * Collecte toutes les classes feuilles du dendrogramme.
+     */
+    private void collectLeaves(DendrogramNode node, Set<String> classes) {
+        if (node.isLeaf()) {
+            classes.add(node.getId());
+        } else {
+            if (node.getLeft() != null) {
+                collectLeaves(node.getLeft(), classes);
+            }
+            if (node.getRight() != null) {
+                collectLeaves(node.getRight(), classes);
+            }
+        }
     }
     
     /**

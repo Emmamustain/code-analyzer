@@ -107,7 +107,7 @@ public class CouplingTextPanel extends JPanel {
             // === ANALYSE SPOON ===
             statusLabel.setText("Analyse Spoon en cours...");
             SpoonCouplingService spoonService = new SpoonCouplingService(analyzer);
-            spoonService.calculateCoupling();
+            spoonService.calculateCouplingMatrix();
             Map<String, Map<String, Integer>> spoonCounts = spoonService.getCouplingMatrix();
             Map<String, Map<String, Double>> spoonWeights = spoonService.getCouplingWeights();
             int spoonTotal = spoonService.getTotalCalls();

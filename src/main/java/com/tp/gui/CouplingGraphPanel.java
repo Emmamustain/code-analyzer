@@ -153,7 +153,7 @@ public class CouplingGraphPanel extends JPanel {
                 // Utiliser Spoon pour le couplage
                 statusLabel.setText("Analyse du couplage avec Spoon...");
                 SpoonCouplingService spoonService = new SpoonCouplingService(analyzer);
-                spoonService.calculateCoupling();
+                spoonService.calculateCouplingMatrix();
                 counts = spoonService.getCouplingMatrix();
                 weights = spoonService.getCouplingWeights();
                 total = spoonService.getTotalCalls();

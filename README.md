@@ -2,6 +2,9 @@
 
 Ce projet est un analyseur statique complet pour applications Java qui calcule des métriques de couplage entre classes et implémente un algorithme de clustering hiérarchique pour identifier des modules cohésifs. L'application propose une interface graphique moderne réalisée avec Java Swing.
 
+- **Lien drive de tout les documets** : https://drive.google.com/drive/folders/1RrhqQpm_X75x_Wi80YTwqIDpfMCOH0l4?usp=sharing
+- **Lien Dépôt GitHub** : https://github.com/Emmamustain/code-analyzer
+
 ## Fonctionnalités
 
 ### Métriques de base
